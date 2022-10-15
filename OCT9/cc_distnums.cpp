@@ -5,16 +5,15 @@ int max_n = 1e7;
 
 vector<int> sieve(max_n + 1, 1);
 vector<int> max_prime(max_n + 1, 1);
-
 void make_sieve()
 {
     sieve[0] = 0;
     sieve[1] = 0;
-    for (int i = 2; i <= max_n; i++)
+    for (int i = 2; i * i <= max_n; i++)
     {
         if (sieve[i])
         {
-            for (int j = 2*i; j <= max_n; j += i)
+            for (int j = i * i; j <= max_n; j += i)
                 sieve[j] = 0;
         }
     }
@@ -32,21 +31,21 @@ void make_max_prime()
 
 
 
-int mod_mul(long long a, long long b, int M = (int)1e9 + 7)
+int mod_mul(long long a, long long b, int M = 1e9 + 7)
 {
     a %= M;
     b %= M;
     return ((1LL * a * b) % M + M) % M;
 }
 
-int mod_add(long long a, long long b, int M = (int)1e9 + 7)
+int mod_add(long long a, long long b, int M = 1e9 + 7)
 {
     a %= M;
     b %= M;
     return ((a + b) % M + M) % M;
 }
 
-int mod_sub(long long a, long long b, int M = (int)1e9 + 7)
+int mod_sub(long long a, long long b, int M = 1e9 + 7)
 {
     a %= M;
     b %= M;
@@ -61,7 +60,7 @@ int power(long long a, long long b, int M = (int)1e9 + 7)
     long long p = a;
     while (b > 0)
     {
-        if (b&1)
+        if (b & 1)
         {
             res = mod_mul(res, p,M);
         }
@@ -71,78 +70,47 @@ int power(long long a, long long b, int M = (int)1e9 + 7)
     return res;
 }
 
-
-// int power(int a,int b, int M=(int)1e9+7)
-// {
-//     int res=1;
-//     int p=a%M;
-
-//     while(b>0)
-//     {
-//         if(b&1)
-//         {
-//             res=(1LL * res * p)%M;
-//         }
-//         p=(1LL * p*p)%M;
-//         b>>=1;
-//     }
-//     // cout<<"res: "<<res<<endl;
-//     return res;
-// }
-
 int mod_inverse(long long a, int M = (int)1e9 + 7)
 {
 
     int phiM = M - 1;
     a %= M;
     int inv = power(a, phiM - 1, M);
-
     return inv;
 }
 
 
 void solve()
 {
-    int n,k; cin>>n>>k;    
+    int n,k; cin>>n>>k;
+
     long long res=n;
-
-    map<int,int> mp;
-    for(int i=2;i*i<=n;i++)
-    {
-        if(n%i==0)
-        {
-            while (n%i==0)
-            {
-                mp[i]++;
-                n/=i;
-                /* code */
-            }
-            
-        }
-    }
-
-    if(n>1)
-    {
-        mp[n]++;
-    }
-    // cout<<"n: "<<n<<endl;
-    // cout<<"k: "<<k<<endl;
-    // long long res=n;
 
     int M=1e9+7;
     int phiM=M-1;
-    for(pair<int,int> p:mp)
+    while (n>1)
     {
 
-        int cur_prime=p.first;
+        int cur_prime=max_prime[n];
         int pr=cur_prime;
-        int cnt=p.second;
-
+        int cnt=0;
+        
+        // cout<<"cur_prime: "<<cur_prime<<endl;
+        while (n>1 && cur_prime==max_prime[n])
+        {
+            n/=cur_prime;
+            cnt++;
+            /* code */
+        }
         int ar=cnt;
+        // res * (pr^[[(2^k)*ar] - ar + 1)]-1)/(pr-1)
+
+        //  find pr ^ [[(2^k)*ar] - ar + 1)] %M
+
+        // [(2^k*ar) - ar + 1]%phiM
+        // [(2^k % phiM * ar%phiM ) - ar + 1]%phiM
 
         int t1=power(2,k,phiM);
-        
-        // cout<<"t1: "<<t1<<endl;
         t1=mod_mul(t1,ar,phiM);
         t1=mod_sub(t1,ar,phiM);
         t1=mod_add(t1,1,phiM);
@@ -153,36 +121,29 @@ void solve()
         // res * (pr^[t1]-1)/(pr-1) %M
         int nr=power(pr,pr_ki_power);
         nr=mod_sub(nr,1);
-        // cout<<"nr: "<<nr<<endl;
 
-        int deno=mod_inverse(pr-1);     
+        int deno=mod_inverse(pr-1);
 
         // (pr^[t1]-1)/(pr-1) %M
         int entire_thing=mod_mul(nr,deno);
-        
-        // cout<<"entire_thing: "<<entire_thing<<endl;
         res=mod_mul(res,entire_thing);
     }
     cout<<res<<endl;
+    
+
 
 }
 int main()
 {
-    // cout<<"hello"<<endl;
     int t; cin>>t;
-    // make_sieve();
-    // make_max_prime();
-
-    // cout<<sieve[10000000]<<endl;
-
-    // cout<<"t: "<<t<<endl;
-    // return 0;
-
+    make_sieve();
+    make_max_prime();
     while (t--)
     {
         solve();
         /* code */
     }
+    
 
     return 0;
 }
