@@ -5,7 +5,7 @@ int d;
 int M=1e9+7;
 
 int dp[(int)1e4+1][2][100];
-int count(int i,bool tight,int sum)
+int count(int i,bool tight,int sum,string &k)
 {
     if(i==(int)k.size())
     {
@@ -43,7 +43,7 @@ int count(int i,bool tight,int sum)
 
     for(int cur_dig=0;cur_dig<=up;cur_dig++)
     {
-        ans+=count(i+1,tight&(cur_dig==up),(sum+cur_dig)%d);
+        ans+=count(i+1,tight&(cur_dig==up),(sum+cur_dig)%d,k);
         ans%=M;
     }
 
@@ -57,7 +57,12 @@ int main()
     cin>>k>>d;
         
     memset(dp,-1,sizeof(dp));
-    cout<<((count(0,true,0)-1)%M + M)%M<<endl;
+    cout<<((count(0,true,0,k)-1)%M + M)%M<<endl;
     
+
+    // memset R_ans=count
+    // memset L_ans=count
+    // ans=R_ans-L_ans + check(L)
+
     return 0;
 }
