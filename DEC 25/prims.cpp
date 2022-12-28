@@ -50,7 +50,7 @@ class Solution
             {
                int u=adj[node][j][0];
                 int wt=adj[node][j][1];
-                    
+                if(!visited[u])
                 pq.push({wt,u}); 
             }
         }
